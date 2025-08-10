@@ -1,9 +1,13 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { LatestPost } from "~/app/_components/post";
+import { auth, SignedIn, SignedOut } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
+import { NameInput } from "./_components/name";
 
 export default async function Home() {
+  const session = await auth();
   const hello = await api.post.hello({ text: "from tRPC" });
 
   void api.post.getLatest.prefetch();
@@ -39,13 +43,21 @@ export default async function Home() {
               </div>
             </Link>
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
-          </div>
 
-          <LatestPost />
+          <Suspense>
+            <SignedIn>
+              <div className="flex flex-col items-center gap-2">
+                <p className="text-2xl text-white">
+                  Hello, {session?.user?.name}
+                </p>
+              </div>
+
+              <LatestPost />
+            </SignedIn>
+            <SignedOut>
+              <NameInput />
+            </SignedOut>
+          </Suspense>
         </div>
       </main>
     </HydrateClient>

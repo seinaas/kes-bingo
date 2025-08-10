@@ -7,8 +7,16 @@
  * need to use are documented accordingly near the end.
  */
 import { initTRPC } from "@trpc/server";
+import type { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { type Events, IterableEventEmitter } from "../utils/events";
+import { auth } from "../auth";
+import { getSession } from "next-auth/react";
+import type { NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http";
+import type { IncomingMessage } from "http";
+import type ws from "ws";
+import type { Session } from "next-auth";
 
 /**
  * 1. CONTEXT
@@ -22,8 +30,35 @@ import { ZodError } from "zod";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: { headers: Headers }) => {
+
+const ee = new IterableEventEmitter<Events>();
+export const createTRPCContext = async (
+  opts:
+    | { headers: Headers }
+    | NodeHTTPCreateContextFnOptions<IncomingMessage, ws>,
+) => {
+  const session = await auth();
+
+  console.log("createContext for", session?.user?.name ?? "unknown user");
+
   return {
+    session,
+    ee,
+    ...opts,
+  };
+};
+
+export const createWSSContext = async (opts: CreateWSSContextFnOptions) => {
+  let session: Session | null = null;
+  try {
+    session = await getSession();
+  } catch (e) {
+    console.error(e);
+  }
+
+  return {
+    session,
+    ee,
     ...opts,
   };
 };

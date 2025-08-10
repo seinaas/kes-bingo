@@ -5,21 +5,17 @@ import { useState } from "react";
 import { api } from "~/trpc/react";
 
 export function LatestPost() {
-  const [latestPost] = api.post.getLatest.useSuspenseQuery();
+  const { data: latestPost } = api.post.onPostAdd.useSubscription();
 
-  const utils = api.useUtils();
   const [name, setName] = useState("");
-  const createPost = api.post.create.useMutation({
-    onSuccess: async () => {
-      await utils.post.invalidate();
-      setName("");
-    },
-  });
+  const createPost = api.post.create.useMutation();
 
   return (
     <div className="w-full max-w-xs">
       {latestPost ? (
-        <p className="truncate">Your most recent post: {latestPost.name}</p>
+        <p className="truncate">
+          Your most recent post: {latestPost.data.name}
+        </p>
       ) : (
         <p>You have no posts yet.</p>
       )}
