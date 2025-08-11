@@ -1,17 +1,85 @@
-import { createTRPCRouter, publicProcedure } from "../trpc";
+import z from "zod";
+import { authedProcedure, createTRPCRouter, publicProcedure } from "../trpc";
+import { cards } from "~/server/utils/cardStorage";
+import { generateCard } from "~/server/utils/generateCard";
+import type { BingoCard } from "~/types";
 
-type Column = [string, string, string, string, string];
+const cardCache = new Map<string, BingoCard>();
 
-export type Board = {
-  b: Column;
-  i: Column;
-  n: Column;
-  g: Column;
-  o: Column;
+const getOrCreateCard = async (userId: string) => {
+  let card = cardCache.get(userId) ?? null;
+
+  if (!card) {
+    card = await cards.getItem(userId);
+
+    if (!card) {
+      card = generateCard();
+      await cards.setItem(userId, card);
+    }
+
+    cardCache.set(userId, card);
+  }
+
+  return card;
 };
 
 export const bingoRouter = createTRPCRouter({
-  getBoard: publicProcedure.query(() => {
-    return false;
-  }),
+  getCard: publicProcedure
+    .input(z.object({ userId: z.string() }).optional())
+    .query(async ({ input, ctx }) => {
+      const id = input?.userId ?? ctx.session?.user.id;
+
+      if (!id) throw new Error("Unauthorized");
+
+      const card = await getOrCreateCard(id);
+
+      return card;
+    }),
+  toggleCell: authedProcedure
+    .input(z.object({ colIdx: z.number(), rowIdx: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      console.log("Toggling Cell", Date.now());
+
+      const card = await getOrCreateCard(ctx.user.id);
+
+      if (
+        input.colIdx < 0 ||
+        input.colIdx > 4 ||
+        input.rowIdx < 0 ||
+        input.rowIdx > 4
+      ) {
+        throw new Error("Invalid input");
+      }
+
+      const cell = card[input.colIdx]![input.rowIdx]!;
+      cell.checked = !cell.checked;
+
+      ctx.ee.emit("changeCell", ctx.user.id, card);
+      await cards.setItem(ctx.user.id, card);
+
+      console.log("Cell Toggled", Date.now());
+
+      return card;
+    }),
+  onCardChange: publicProcedure
+    .input(z.object({ userId: z.string() }).optional())
+    .subscription(async function* ({ ctx, signal, input }) {
+      const id = input?.userId ?? ctx.session?.user.id;
+
+      if (!id) throw new Error("Unauthorized");
+
+      const iterable = ctx.ee.toIterable("changeCell", {
+        signal,
+      });
+
+      const card = await getOrCreateCard(id);
+      yield card;
+
+      for await (const [userId, newCard] of iterable) {
+        if (userId !== id) {
+          return;
+        }
+        yield newCard;
+      }
+    }),
 });

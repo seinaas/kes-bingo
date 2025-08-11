@@ -1,5 +1,6 @@
 import EventEmitter, { on } from "events";
 import type { Post } from "../api/routers/post";
+import type { BingoCard } from "~/types";
 
 type EventMap<T> = Record<keyof T, unknown[]>;
 export class IterableEventEmitter<
@@ -17,4 +18,5 @@ export class IterableEventEmitter<
 
 export type Events = {
   add: [Post];
+  changeCell: [string, BingoCard];
 };

@@ -1,4 +1,4 @@
-import type { Session } from "next-auth";
+import type { NextAuthConfig, Session } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { cache } from "react";
@@ -6,20 +6,32 @@ import { createStorage } from "unstorage";
 import { z } from "zod";
 import { UnstorageAdapter } from "@auth/unstorage-adapter";
 import { randomUUID } from "crypto";
+import type { BingoCard } from "~/types";
+import { generateCard } from "./utils/generateCard";
+import { cards } from "./utils/cardStorage";
+
+declare module "next-auth" {
+  export interface User {
+    id: string;
+    name: string;
+    card?: BingoCard | null;
+  }
+
+  /**
+   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface Session {
+    user: User;
+  }
+}
 
 const storage = createStorage();
-export const {
-  handlers,
-  auth: uncachedAuth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const authConfig = {
   providers: [
     CredentialsProvider({
       id: "uuid",
       name: "UUID Auth",
       async authorize(input) {
-        console.log("HEREHEREHERE", input);
         const credentials = z
           .union([
             z.object({
@@ -42,11 +54,17 @@ export const {
           return user;
         }
         const userId = randomUUID();
+        const card = generateCard();
 
-        return {
+        const user: Session["user"] = {
           id: userId,
           name: credentials.name,
+          card,
         };
+
+        await cards.setItem(userId, card);
+
+        return user;
       },
       credentials: {
         id: {},
@@ -62,9 +80,16 @@ export const {
       if (user) token.id = user.id;
       return token;
     },
-    session: ({ session, token }) => {
+    session: async ({ session, token }) => {
       if (typeof token.id === "string") session.user.id = token.id!;
-      return session;
+
+      const card = await cards.getItem(session.user.id);
+      const user = {
+        ...session.user,
+        card,
+      };
+
+      return { ...session, user };
     },
     signIn: async () => {
       const currentUser = (await auth())?.user;
@@ -76,8 +101,14 @@ export const {
       return true;
     },
   },
-  trustHost: true,
-});
+} as const satisfies NextAuthConfig;
+
+export const {
+  handlers,
+  auth: uncachedAuth,
+  signIn,
+  signOut,
+} = NextAuth(authConfig);
 
 export const auth = cache(uncachedAuth);
 

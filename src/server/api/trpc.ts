@@ -6,13 +6,13 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import type { CreateWSSContextFnOptions } from "@trpc/server/adapters/ws";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { type Events, IterableEventEmitter } from "../utils/events";
-import { auth } from "../auth";
-import { getSession } from "next-auth/react";
+import { auth, authConfig } from "../auth";
+import { getToken } from "next-auth/jwt";
 import type { NodeHTTPCreateContextFnOptions } from "@trpc/server/adapters/node-http";
 import type { IncomingMessage } from "http";
 import type ws from "ws";
@@ -50,10 +50,32 @@ export const createTRPCContext = async (
 
 export const createWSSContext = async (opts: CreateWSSContextFnOptions) => {
   let session: Session | null = null;
-  try {
-    session = await getSession();
-  } catch (e) {
-    console.error(e);
+
+  if (opts.req.headers.cookie) {
+    try {
+      const token = await getToken({
+        req: opts.req as unknown as Request,
+        secret: process.env.AUTH_SECRET,
+      });
+
+      if (token && "id" in token) {
+        const userId = token.id as string;
+
+        session = await authConfig.callbacks.session({
+          session: {
+            user: {
+              id: userId,
+              name: token.name ?? "User",
+            },
+            expires: new Date(token.exp!),
+            userId: userId,
+          },
+          token,
+        } as unknown as Parameters<typeof authConfig.callbacks.session>[0]);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return {
@@ -136,3 +158,21 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+
+export const authedProcedure = publicProcedure.use(function isAuthed(opts) {
+  const user = opts.ctx.session?.user;
+
+  if (!user?.name) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return opts.next({
+    ctx: {
+      user: {
+        ...user,
+        id: user.id,
+        name: user.name,
+      },
+    },
+  });
+});

@@ -2,6 +2,9 @@ import { appRouter } from "./api/root";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import { WebSocketServer } from "ws";
 import { createWSSContext } from "./api/trpc";
+import nextEnv from "@next/env";
+
+nextEnv.loadEnvConfig(process.cwd());
 
 const wss = new WebSocketServer({
   port: 3001,

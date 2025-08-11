@@ -58,6 +58,10 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             process.env.NODE_ENV === "development" ||
             (op.direction === "down" && op.result instanceof Error),
         }),
+        wsLink({
+          client: wsClient,
+          transformer: SuperJSON,
+        }),
         splitLink({
           condition: (op) => op.type === "subscription",
           true: wsLink({
