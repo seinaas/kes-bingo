@@ -1,10 +1,9 @@
 import { Suspense } from "react";
 
-import { auth, SignedIn, SignedOut } from "~/server/auth";
+import { auth, SignedOut } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
 import { NameInput } from "./_components/name";
-import { BingoCard } from "./_components/bingoCard";
-import { UserList } from "./_components/userList";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const session = await auth();
@@ -12,20 +11,14 @@ export default async function Home() {
 
   void api.user.getUsers.prefetch();
 
+  if (session?.user.id) {
+    redirect(`/user/${session.user.id}`);
+  }
+
   return (
     <HydrateClient>
       <main>
         <Suspense>
-          <SignedIn>
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-2xl text-white">
-                Hello, {session?.user?.name}
-              </p>
-            </div>
-
-            <UserList />
-            <BingoCard />
-          </SignedIn>
           <SignedOut>
             <NameInput />
           </SignedOut>

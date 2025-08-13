@@ -1,8 +1,9 @@
-import { authedProcedure, createTRPCRouter } from "../trpc";
+import z from "zod";
+import { authedProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 import { userStorage, type BaseUser } from "~/server/utils/storage";
 
 export const userRouter = createTRPCRouter({
-  getUsers: authedProcedure.query(async () => {
+  getUsers: publicProcedure.query(async () => {
     const keys = await userStorage.getKeys();
 
     const users: BaseUser[] = [];
@@ -13,4 +14,15 @@ export const userRouter = createTRPCRouter({
 
     return users;
   }),
+  getUser: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
+      const user = await userStorage.getItem(input.userId);
+
+      if (!user) {
+        throw new Error("User Not Found");
+      }
+
+      return user;
+    }),
 });

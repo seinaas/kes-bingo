@@ -17,16 +17,13 @@ export const BingoCard = ({ userId }: { userId?: string }) => {
 
   return (
     <>
-      <button onClick={() => signOut({ redirectTo: "/", redirect: true })}>
-        SIGN OUT
-      </button>
       <div className="grid aspect-square w-full max-w-xl grid-cols-5 grid-rows-5 overflow-hidden">
         {bingoCard?.map((col, colIdx) =>
           col.map((cell, rowIdx) => {
             return (
               <button
                 className={cn(
-                  "flex aspect-square cursor-pointer items-center justify-center bg-white p-4 text-black select-none",
+                  "flex aspect-square cursor-pointer items-center justify-center bg-white p-4 text-xs text-black select-none",
                   cell.checked && "bg-red-400",
                 )}
                 key={`card-${userId}-${colIdx}-${rowIdx}`}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import type { BaseUser } from "~/server/utils/storage";
 import { api } from "~/trpc/react";
@@ -22,16 +22,22 @@ export const UserList = () => {
   const { data: users } = api.user.getUsers.useQuery();
 
   return (
-    <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-4">
-      {users
-        ?.sort((a, _) => (a.id === session?.user.id ? -1 : 0))
-        .map((user) => (
-          <UserBadge
-            key={`user-${user.id}`}
-            user={user}
-            myId={session?.user.id}
-          />
-        ))}
+    <div>
+      {" "}
+      <button onClick={() => signOut({ redirectTo: "/", redirect: true })}>
+        SIGN OUT
+      </button>
+      <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-4">
+        {users
+          ?.filter((a) => a.id !== session?.user.id)
+          .map((user) => (
+            <UserBadge
+              key={`user-${user.id}`}
+              user={user}
+              myId={session?.user.id}
+            />
+          ))}
+      </div>
     </div>
   );
 };
