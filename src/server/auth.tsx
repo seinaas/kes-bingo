@@ -2,18 +2,14 @@ import type { NextAuthConfig, Session } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { cache } from "react";
-import { createStorage } from "unstorage";
 import { z } from "zod";
-import { UnstorageAdapter } from "@auth/unstorage-adapter";
 import { randomUUID } from "crypto";
 import type { BingoCard } from "~/types";
 import { generateCard } from "./utils/generateCard";
-import { cards } from "./utils/cardStorage";
+import { userStorage, cards, type BaseUser } from "./utils/storage";
 
 declare module "next-auth" {
-  export interface User {
-    id: string;
-    name: string;
+  export interface User extends BaseUser {
     card?: BingoCard | null;
   }
 
@@ -25,7 +21,6 @@ declare module "next-auth" {
   }
 }
 
-const storage = createStorage();
 export const authConfig = {
   providers: [
     CredentialsProvider({
@@ -45,7 +40,7 @@ export const authConfig = {
 
         if ("id" in credentials) {
           // Get user with credentials.id and return
-          const user = null;
+          const user = await userStorage.getItem(credentials.id);
 
           if (!user) {
             throw new Error("Invalid ID");
@@ -56,15 +51,15 @@ export const authConfig = {
         const userId = randomUUID();
         const card = generateCard();
 
-        const user: Session["user"] = {
+        const user = {
           id: userId,
           name: credentials.name,
-          card,
         };
 
+        await userStorage.setItem(userId, user);
         await cards.setItem(userId, card);
 
-        return user;
+        return { ...user, card };
       },
       credentials: {
         id: {},
@@ -74,7 +69,6 @@ export const authConfig = {
   session: {
     strategy: "jwt",
   },
-  adapter: UnstorageAdapter(storage),
   callbacks: {
     jwt: ({ token, user }) => {
       if (user) token.id = user.id;

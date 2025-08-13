@@ -170,7 +170,7 @@ export const authedProcedure = publicProcedure.use(function isAuthed(opts) {
     ctx: {
       user: {
         ...user,
-        id: user.id,
+        id: user.id!,
         name: user.name,
       },
     },

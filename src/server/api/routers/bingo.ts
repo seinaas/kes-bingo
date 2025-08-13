@@ -1,6 +1,6 @@
 import z from "zod";
 import { authedProcedure, createTRPCRouter, publicProcedure } from "../trpc";
-import { cards } from "~/server/utils/cardStorage";
+import { cards } from "~/server/utils/storage";
 import { generateCard } from "~/server/utils/generateCard";
 import type { BingoCard } from "~/types";
 
@@ -49,6 +49,10 @@ export const bingoRouter = createTRPCRouter({
         input.rowIdx > 4
       ) {
         throw new Error("Invalid input");
+      }
+
+      if (input.colIdx === 2 && input.rowIdx === 2) {
+        throw new Error("Can't uncheck free square");
       }
 
       const cell = card[input.colIdx]![input.rowIdx]!;

@@ -9,7 +9,7 @@ export const NameInput = () => {
   return (
     <form
       onSubmit={async () => {
-        await signIn("uuid", { redirect: false, name });
+        await signIn("uuid", { name });
       }}
     >
       <input
