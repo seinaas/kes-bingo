@@ -1,10 +1,12 @@
 "use client";
 
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { cn } from "~/server/utils/cn";
 import { api } from "~/trpc/react";
 
 export const BingoCard = ({ userId }: { userId?: string }) => {
+  const { data: session } = useSession();
+
   const { data: bingoCard } = api.bingo.onCardChange.useSubscription(
     userId ? { userId } : undefined,
   );
@@ -15,8 +17,10 @@ export const BingoCard = ({ userId }: { userId?: string }) => {
 
   return (
     <>
-      <button onClick={() => signOut()}>SIGN OUT</button>
-      <div className="grid aspect-square grid-cols-5 grid-rows-5">
+      <button onClick={() => signOut({ redirectTo: "/", redirect: true })}>
+        SIGN OUT
+      </button>
+      <div className="grid aspect-square w-full max-w-xl grid-cols-5 grid-rows-5 overflow-hidden">
         {bingoCard?.map((col, colIdx) =>
           col.map((cell, rowIdx) => {
             return (
@@ -28,6 +32,7 @@ export const BingoCard = ({ userId }: { userId?: string }) => {
                 key={`card-${userId}-${colIdx}-${rowIdx}`}
                 disabled={toggleCell.isPending}
                 onClick={() => {
+                  if (userId && userId != session?.user.id) return;
                   if (colIdx != 2 || rowIdx != 2) {
                     cell.checked = !cell.checked;
                     toggleCell.mutate({ colIdx, rowIdx });

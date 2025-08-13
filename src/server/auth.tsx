@@ -1,4 +1,4 @@
-import type { NextAuthConfig, Session } from "next-auth";
+import type { NextAuthConfig, Session, User } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { cache } from "react";
@@ -20,6 +20,21 @@ declare module "next-auth" {
     user: User;
   }
 }
+
+const createUser = async (name: string): Promise<User> => {
+  const userId = randomUUID();
+  const card = generateCard();
+
+  const user = {
+    id: userId,
+    name: name,
+  };
+
+  await userStorage.setItem(userId, user);
+  await cards.setItem(userId, card);
+
+  return { ...user, card };
+};
 
 export const authConfig = {
   providers: [
@@ -48,18 +63,9 @@ export const authConfig = {
 
           return user;
         }
-        const userId = randomUUID();
-        const card = generateCard();
+        const user = await createUser(credentials.name);
 
-        const user = {
-          id: userId,
-          name: credentials.name,
-        };
-
-        await userStorage.setItem(userId, user);
-        await cards.setItem(userId, card);
-
-        return { ...user, card };
+        return user;
       },
       credentials: {
         id: {},
