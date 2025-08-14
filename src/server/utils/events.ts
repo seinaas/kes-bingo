@@ -19,4 +19,5 @@ export class IterableEventEmitter<
 export type Events = {
   add: [Post];
   changeCell: [string, BingoCard];
+  changeUsers: [];
 };

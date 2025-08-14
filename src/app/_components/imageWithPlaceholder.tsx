@@ -19,6 +19,7 @@ export function ImageWithPlaceholder({ src, alt, ...rest }: ImageProps) {
       priority
       placeholder="blur"
       blurDataURL="/placeholder_48x48.png"
+      sizes="100%"
       onLoad={(e) => {
         if ((e as unknown as HTMLImageElement).naturalWidth === 0) {
           // Broken image

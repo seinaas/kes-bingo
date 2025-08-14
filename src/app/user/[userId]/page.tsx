@@ -11,14 +11,19 @@ export default async function UserPage({
 }) {
   const session = await auth();
   const { userId } = await params;
-  const user = await api.user.getUser({ userId });
 
-  return (
-    <HydrateClient>
-      <div>Viewing {user.name}&apos;s board.</div>
-      <UserList />
-      <BingoCard userId={userId} />
-      {userId !== session?.user.id && <ReturnButton />}
-    </HydrateClient>
-  );
+  try {
+    const user = await api.user.getUser({ userId });
+
+    return (
+      <HydrateClient>
+        <div>Viewing {user.name}&apos;s board.</div>
+        <UserList />
+        <BingoCard userId={userId} />
+        {userId !== session?.user.id && <ReturnButton />}
+      </HydrateClient>
+    );
+  } catch (e) {
+    console.error(e);
+  }
 }

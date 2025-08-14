@@ -6,6 +6,7 @@ import { env } from "~/env";
 import type { BaseUser } from "~/server/utils/storage";
 import { api } from "~/trpc/react";
 import { ImageWithPlaceholder } from "./imageWithPlaceholder";
+import { useState } from "react";
 
 const UserBadge = ({ user, myId }: { user: BaseUser; myId?: string }) => {
   return (
@@ -30,9 +31,11 @@ const UserBadge = ({ user, myId }: { user: BaseUser; myId?: string }) => {
 
 export const UserList = () => {
   const { data: session } = useSession();
-  const { data: users } = api.user.getUsers.useQuery();
 
-  console.log("HERHERHERHER", users);
+  const [users, setUsers] = useState<BaseUser[]>([]);
+  api.user.onUsersChange.useSubscription(undefined, {
+    onData: (users) => setUsers(users),
+  });
 
   return (
     <div>
@@ -41,9 +44,9 @@ export const UserList = () => {
         SIGN OUT
       </button>
       <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-3">
-        {users
-          ?.filter((a) => a.id !== session?.user.id)
-          ?.map((user) => (
+        {[...users.values()]
+          // ?.filter((a) => a.id !== session?.user.id)
+          .map((user) => (
             <UserBadge
               key={`user-${user.id}`}
               user={user}
