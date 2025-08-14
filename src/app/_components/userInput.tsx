@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Camera } from "lucide-react";
 import {} from "@uploadthing/react";
 import { uploadFiles } from "~/server/utils/uploadThing";
-import { redirect } from "next/navigation";
 
 export const UserInput = () => {
   const [name, setName] = useState("");
@@ -34,7 +33,7 @@ export const UserInput = () => {
         });
       }
 
-      redirect("/");
+      window.location.reload();
     },
     [image, name],
   );
