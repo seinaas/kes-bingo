@@ -80,10 +80,9 @@ export const bingoRouter = createTRPCRouter({
       yield card;
 
       for await (const [userId, newCard] of iterable) {
-        if (userId !== id) {
-          return;
+        if (userId === id) {
+          yield newCard;
         }
-        yield newCard;
       }
     }),
 });
