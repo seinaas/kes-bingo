@@ -2,7 +2,7 @@ import { Suspense } from "react";
 
 import { auth, SignedOut } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
-import { NameInput } from "./_components/name";
+import { UserInput } from "./_components/userInput";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
@@ -20,7 +20,7 @@ export default async function Home() {
       <main>
         <Suspense>
           <SignedOut>
-            <NameInput />
+            <UserInput />
           </SignedOut>
         </Suspense>
       </main>

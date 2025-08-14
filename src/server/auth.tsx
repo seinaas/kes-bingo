@@ -21,7 +21,19 @@ declare module "next-auth" {
   }
 }
 
-const createUser = async (name: string): Promise<User> => {
+const createUserSchema = z.object({
+  name: z.string(),
+});
+
+const credentialsSchema = z.union([
+  z.object({
+    id: z.string(),
+  }),
+  createUserSchema,
+]);
+type CreateUserInput = z.infer<typeof createUserSchema>;
+
+const createUser = async ({ name }: CreateUserInput): Promise<User> => {
   const userId = randomUUID();
   const card = generateCard();
 
@@ -42,16 +54,7 @@ export const authConfig = {
       id: "uuid",
       name: "UUID Auth",
       async authorize(input) {
-        const credentials = z
-          .union([
-            z.object({
-              id: z.string(),
-            }),
-            z.object({
-              name: z.string(),
-            }),
-          ])
-          .parse(input);
+        const credentials = credentialsSchema.parse(input);
 
         if ("id" in credentials) {
           // Get user with credentials.id and return
@@ -63,7 +66,8 @@ export const authConfig = {
 
           return user;
         }
-        const user = await createUser(credentials.name);
+
+        const user = await createUser(credentials);
 
         return user;
       },

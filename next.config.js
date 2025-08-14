@@ -4,7 +4,12 @@
  */
 import "./src/env.js";
 
+const imgUrl = process.env.NEXT_PUBLIC_IMAGE_BASE_URL;
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  images: {
+    remotePatterns: [new URL(imgUrl ? `${imgUrl}**` : "")],
+  },
+};
 
 export default config;
