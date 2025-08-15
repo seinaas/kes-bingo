@@ -1,9 +1,34 @@
 import { type BingoCard, type Column } from "~/types";
 
-const cellBank: string[] = [];
-for (let i = 0; i < 50; i++) {
-  cellBank.push(`Temp #${i}`);
-}
+const cellBank: string[] = [
+  "Tiny finger claps",
+  "Tongue pop",
+  "Shooketh",
+  "YAAASS",
+  "And I OOP",
+  "Sneezes",
+  "Labubu",
+  "Snorts",
+  "Hand twirls",
+  '"I\'ll get one if you get one"',
+  "Face pose",
+  "Suggests to buy things",
+  '"Girl"',
+  "Mentions shisha",
+  "Mentions Marvel Rivals",
+  "Talks about Karen",
+  '"Wack-ass feet"',
+  "Wants to do shots",
+  "Mentions graphic design",
+  "Spills drink",
+  "Gossips",
+  "Talks about jewelery",
+  "Talks about new job",
+  "Mentions Fed",
+  "Mentions Hercules",
+  "Mentions Korea",
+  "Mentions anime",
+];
 
 const randomNoRepeats = (array: string[]) => {
   let copy = array.slice(0);

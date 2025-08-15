@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Outfit } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
@@ -13,9 +13,9 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-const geist = Geist({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
+  variable: "--font-outfit-sans",
 });
 
 export default async function RootLayout({
@@ -23,7 +23,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth();
   return (
-    <html lang="en" className={`${geist.variable}`}>
+    <html lang="en" className={`${outfit.variable}`}>
       <body>
         <SessionProvider session={session}>
           <TRPCReactProvider>

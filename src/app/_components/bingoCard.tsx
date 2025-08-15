@@ -23,7 +23,7 @@ export const BingoCard = ({ userId }: { userId?: string }) => {
             return (
               <button
                 className={cn(
-                  "flex aspect-square cursor-pointer items-center justify-center bg-white p-4 text-xs text-black select-none",
+                  "flex aspect-square cursor-pointer items-center justify-center bg-white p-1 text-xs text-black select-none",
                   cell.checked && "bg-red-400",
                 )}
                 key={`card-${userId}-${colIdx}-${rowIdx}`}
