@@ -51,12 +51,18 @@ export const createTRPCContext = async (
 export const createWSSContext = async (opts: CreateWSSContextFnOptions) => {
   let session: Session | null = null;
 
+  console.log(
+    "createWSSContext for",
+    opts.req.headers["x-forwarded-for"] ?? "unknown user",
+  );
   if (opts.req.headers.cookie) {
     try {
       const token = await getToken({
         req: opts.req as unknown as Request,
         secret: process.env.AUTH_SECRET,
       });
+
+      console.log("Token retrieved:", token);
 
       if (token && "id" in token) {
         const userId = token.id as string;
@@ -72,6 +78,8 @@ export const createWSSContext = async (opts: CreateWSSContextFnOptions) => {
           },
           token,
         } as unknown as Parameters<typeof authConfig.callbacks.session>[0]);
+
+        console.log("Session created for user:", session);
       }
     } catch (e) {
       console.error(e);
@@ -163,7 +171,10 @@ export const authedProcedure = publicProcedure.use(function isAuthed(opts) {
   const user = opts.ctx.session?.user;
 
   if (!user?.name) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: JSON.stringify(opts),
+    });
   }
 
   return opts.next({
