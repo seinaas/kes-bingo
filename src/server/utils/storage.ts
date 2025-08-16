@@ -5,6 +5,7 @@ import fsDriver from "unstorage/drivers/fs";
 export interface BaseUser {
   id: string;
   name: string;
+  didWin?: boolean;
 }
 
 export const cards = createStorage<BingoCard>({

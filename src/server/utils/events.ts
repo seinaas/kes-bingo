@@ -20,4 +20,5 @@ export type Events = {
   add: [Post];
   changeCell: [string, BingoCard];
   changeUsers: [];
+  win: [string];
 };

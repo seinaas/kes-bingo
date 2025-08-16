@@ -37,9 +37,10 @@ const createUser = async ({ name }: CreateUserInput): Promise<User> => {
   const userId = randomUUID();
   const card = generateCard();
 
-  const user = {
+  const user: BaseUser = {
     id: userId,
     name: name,
+    didWin: false,
   };
 
   await userStorage.setItem(userId, user);
