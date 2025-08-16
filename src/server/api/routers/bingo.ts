@@ -96,13 +96,20 @@ export const bingoRouter = createTRPCRouter({
 
       const cell = card[input.colIdx]![input.rowIdx]!;
       cell.checked = !cell.checked;
+      const user = await userStorage.getItem(ctx.user.id);
 
       if (checkWin(card)) {
-        const user = await userStorage.getItem(ctx.user.id);
+        // const user = await userStorage.getItem(ctx.user.id);
         if (user && !user.didWin) {
           user.didWin = true;
           await userStorage.setItem(ctx.user.id, user);
-          ctx.ee.emit("win", ctx.user.id);
+          ctx.ee.emit("changeUsers");
+        }
+      } else {
+        if (user?.didWin) {
+          user.didWin = false;
+          await userStorage.setItem(ctx.user.id, user);
+          ctx.ee.emit("changeUsers");
         }
       }
 

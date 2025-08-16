@@ -66,15 +66,6 @@ export const UserList = ({ currentUserId }: { currentUserId: string }) => {
       }
     },
   });
-  api.bingo.onWin.useSubscription(undefined, {
-    onData: (userId) => {
-      const user = users?.find((u) => u.id === userId);
-      if (user) {
-        user.didWin = true;
-      }
-      console.log("User won:", userId);
-    },
-  });
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
