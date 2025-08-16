@@ -20,8 +20,9 @@ const UserBadge = ({
   return (
     <div
       className={cn(
-        "from-primary-100/90 to-primary-200/80 text-primary-900 flex w-16 flex-col items-center justify-center gap-1 overflow-clip rounded-[50px_50px_10px_10px] bg-linear-to-b from-70% px-0.5 pb-1",
-        currentUserId === user.id && "from-accent-300 to-accent-500/80",
+        "from-primary-100/90 to-primary-200/80 text-primary-900 flex w-16 flex-col items-center justify-center gap-1 overflow-clip rounded-[50px_50px_10px_10px] bg-linear-to-b from-70% px-0.5 pb-1 shadow-md transition-all",
+        currentUserId === user.id &&
+          "from-accent-300 to-accent-500/80 shadow-xl",
       )}
     >
       <Link

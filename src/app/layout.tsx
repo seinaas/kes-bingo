@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Lobster, Outfit } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
@@ -18,12 +18,18 @@ const outfit = Outfit({
   variable: "--font-outfit-sans",
 });
 
+const lobser = Lobster({
+  subsets: ["latin"],
+  variable: "--font-lobster",
+  weight: "400",
+});
+
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth();
   return (
-    <html lang="en" className={`${outfit.variable}`}>
+    <html lang="en" className={`${outfit.variable} ${lobser.variable}`}>
       <body>
         <SessionProvider session={session}>
           <TRPCReactProvider>

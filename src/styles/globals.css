@@ -5,6 +5,8 @@
     var(--font-outfit-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
+  --font-title: var(--font-lobster), cursive;
+
   --color-primary-900: #2a2a72;
   --color-primary-800: #3d418b;
   --color-primary-700: #5258a4;

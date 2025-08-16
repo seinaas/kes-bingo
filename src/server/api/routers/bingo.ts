@@ -24,8 +24,8 @@ const getOrCreateCard = async (userId: string) => {
 };
 
 export const bingoRouter = createTRPCRouter({
-  getCard: publicProcedure
-    .input(z.object({ userId: z.string() }).optional())
+  getCard: authedProcedure
+    .input(z.object({ userId: z.string().optional() }).optional())
     .query(async ({ input, ctx }) => {
       const id = input?.userId ?? ctx.session?.user.id;
 
