@@ -2,7 +2,6 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { env } from "~/env";
 import type { BaseUser } from "~/server/utils/storage";
 import { api } from "~/trpc/react";
 import { ImageWithPlaceholder } from "./imageWithPlaceholder";
@@ -35,7 +34,7 @@ const UserBadge = ({
         )}
       >
         <ImageWithPlaceholder
-          src={`${env.NEXT_PUBLIC_IMAGE_BASE_URL}${user.id}`}
+          src={`${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}${user.id}`}
           alt={`${user.name}`}
           fill
           className="object-cover"

@@ -1,3 +1,5 @@
+import "./utils/asyncLocalStorageSetup";
+
 import next from "next";
 import { createServer } from "node:http";
 import { parse } from "node:url";
@@ -21,11 +23,18 @@ void app.prepare().then(() => {
     const parsedUrl = parse(req.url, true);
     await handle(req, res, parsedUrl);
   });
-  const wss = new WebSocketServer({ server });
+  const wss = new WebSocketServer({ noServer: true });
   const handler = applyWSSHandler({
     wss,
     router: appRouter,
     createContext: createTRPCContext,
+  });
+
+  wss.on("connection", (ws: Socket) => {
+    console.log(`➕➕ Connection (${wss.clients.size})`);
+    ws.once("close", () => {
+      console.log(`➖➖ Connection (${wss.clients.size})`);
+    });
   });
 
   process.on("SIGTERM", () => {
@@ -33,10 +42,13 @@ void app.prepare().then(() => {
     handler.broadcastReconnectNotification();
   });
 
-  server.on("upgrade", (req, socket, head) => {
-    wss.handleUpgrade(req, socket as Socket, head, (ws) => {
-      wss.emit("connection", ws, req);
-    });
+  server.on("upgrade", function (req, socket, head) {
+    const { pathname } = parse(req.url!, true);
+    if (pathname !== "/_next/webpack-hmr") {
+      wss.handleUpgrade(req, socket, head, function done(ws) {
+        wss.emit("connection", ws, req);
+      });
+    }
   });
 
   // Keep the next.js upgrade handler from being added to our custom server
