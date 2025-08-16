@@ -1,6 +1,6 @@
 import z from "zod";
 import { authedProcedure, createTRPCRouter, publicProcedure } from "../trpc";
-import { userStorage, type BaseUser } from "~/server/utils/storage";
+import { cards, userStorage, type BaseUser } from "~/server/utils/storage";
 
 const getUsers = async () => {
   const keys = await userStorage.getKeys();
@@ -30,6 +30,29 @@ export const userRouter = createTRPCRouter({
       }
 
       return user;
+    }),
+  removeUser: authedProcedure
+    .input(z.object({ userId: z.string() }).optional())
+    .mutation(async ({ input, ctx }) => {
+      if (
+        input?.userId &&
+        input.userId !== ctx.user.id &&
+        ctx.user.name !== "Seina"
+      ) {
+        throw new Error("You are not allowed to remove users");
+      }
+
+      const id = input?.userId ?? ctx.user.id;
+
+      const user = await userStorage.getItem(id);
+      if (!user) {
+        throw new Error("User Not Found");
+      }
+
+      await userStorage.removeItem(id);
+      await cards.removeItem(id);
+
+      ctx.ee.emit("changeUsers");
     }),
   updateUser: authedProcedure
     .input(

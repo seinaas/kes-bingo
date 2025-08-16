@@ -67,6 +67,13 @@ export const bingoRouter = createTRPCRouter({
 
       return card;
     }),
+  resetCard: authedProcedure.mutation(async ({ ctx }) => {
+    const card = generateCard();
+    await cards.setItem(ctx.user.id, card);
+    cardCache.set(ctx.user.id, card);
+
+    ctx.ee.emit("changeCell", ctx.user.id, card);
+  }),
   toggleCell: authedProcedure
     .input(z.object({ colIdx: z.number(), rowIdx: z.number() }))
     .mutation(async ({ input, ctx }) => {

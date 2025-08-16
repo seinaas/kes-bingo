@@ -18,6 +18,7 @@ declare module "next-auth" {
    */
   interface Session {
     user: User;
+    error?: string;
   }
 }
 
@@ -88,13 +89,18 @@ export const authConfig = {
     session: async ({ session, token }) => {
       if (typeof token.id === "string") session.user.id = token.id!;
 
+      const user = await userStorage.getItem(session.user.id);
+      if (!user) {
+        session.error = "inactive-user";
+      }
+
       const card = await cards.getItem(session.user.id);
-      const user = {
-        ...session.user,
+      const sessionUser = {
+        ...user,
         card,
       };
 
-      return { ...session, user };
+      return { ...session, user: sessionUser };
     },
     signIn: async () => {
       const currentUser = (await auth())?.user;

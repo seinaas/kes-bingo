@@ -1,4 +1,5 @@
 import { BingoCard } from "~/app/_components/bingoCard";
+import { UserActions } from "~/app/_components/userActions";
 import { UserList } from "~/app/_components/userList";
 import { HydrateClient } from "~/trpc/server";
 
@@ -12,10 +13,11 @@ export default async function UserPage({
   try {
     return (
       <HydrateClient>
-        <div className="container flex flex-col items-center gap-6 px-2 py-16">
+        <div className="container flex flex-1 flex-col items-center gap-6 px-2 py-16">
           <div className="font-title stroke-3 text-6xl">Kes Bingo</div>
           <UserList currentUserId={userId} />
           <BingoCard userId={userId} />
+          <UserActions userId={userId} />
         </div>
       </HydrateClient>
     );

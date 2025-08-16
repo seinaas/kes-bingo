@@ -58,7 +58,15 @@ export const UserList = ({ currentUserId }: { currentUserId: string }) => {
 
   const { data: initialUsers } = api.user.getUsers.useQuery();
 
-  const { data: users } = api.user.onUsersChange.useSubscription();
+  const { data: users } = api.user.onUsersChange.useSubscription(undefined, {
+    onData: (newUsers) => {
+      const me = newUsers.find((u) => u.id === session?.user.id);
+      if (!me) {
+        console.error("Current user not found in user list");
+        void signOut({ redirectTo: "/", redirect: true });
+      }
+    },
+  });
   api.bingo.onWin.useSubscription(undefined, {
     onData: (userId) => {
       const user = users?.find((u) => u.id === userId);
@@ -70,11 +78,7 @@ export const UserList = ({ currentUserId }: { currentUserId: string }) => {
   });
 
   return (
-    <div>
-      {" "}
-      <button onClick={() => signOut({ redirectTo: "/", redirect: true })}>
-        SIGN OUT
-      </button>
+    <div className="flex flex-col items-center justify-center gap-2">
       <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-1">
         {(users ?? initialUsers)
           // ?.filter((a) => a.id !== session?.user.id)
