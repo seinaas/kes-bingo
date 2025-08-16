@@ -17,7 +17,7 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <main>
+      <main className="flex flex-1 flex-col items-center justify-center gap-8">
         <Suspense>
           <SignedOut>
             <UserInput />

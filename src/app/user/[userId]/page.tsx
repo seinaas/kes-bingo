@@ -2,7 +2,7 @@ import { BingoCard } from "~/app/_components/bingoCard";
 import { ReturnButton } from "~/app/_components/returnButton";
 import { UserList } from "~/app/_components/userList";
 import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient } from "~/trpc/server";
 
 export default async function UserPage({
   params,
@@ -13,14 +13,14 @@ export default async function UserPage({
   const { userId } = await params;
 
   try {
-    const user = await api.user.getUser({ userId });
-
     return (
       <HydrateClient>
-        <div>Viewing {user.name}&apos;s board.</div>
-        <UserList />
-        <BingoCard userId={userId} />
-        {userId !== session?.user.id && <ReturnButton />}
+        <div className="container flex flex-col items-center gap-6 px-2 py-16">
+          <div>KES BINGO</div>
+          <UserList currentUserId={userId} />
+          <BingoCard userId={userId} />
+          {userId !== session?.user.id && <ReturnButton />}
+        </div>
       </HydrateClient>
     );
   } catch (e) {

@@ -1,7 +1,7 @@
 import "~/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Geist, Outfit } from "next/font/google";
+import { Outfit } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
@@ -27,10 +27,8 @@ export default async function RootLayout({
       <body>
         <SessionProvider session={session}>
           <TRPCReactProvider>
-            <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-              <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-                {children}
-              </div>
+            <div className="from-primary-300 to-primary-500 flex min-h-screen flex-col items-center bg-radial text-white">
+              {children}
             </div>
           </TRPCReactProvider>
         </SessionProvider>

@@ -40,7 +40,7 @@ export const UserInput = () => {
 
   return (
     <form
-      className="flex flex-col items-center justify-center gap-4"
+      className="from-primary-900/50 to-primary-900/80 flex border-separate flex-col items-center justify-center gap-2 rounded-[300px_300px_30px_30px] bg-gradient-to-b p-2 shadow-xl"
       onSubmit={handleSubmit}
     >
       <div>
@@ -54,7 +54,7 @@ export const UserInput = () => {
         />
         <label
           htmlFor="userImage"
-          className="flex h-48 w-48 items-center justify-center overflow-clip rounded-full bg-gray-400"
+          className="bg-primary-100/90 text-primary-900/50 mb-2 flex h-48 w-48 items-center justify-center overflow-clip rounded-full border-4"
         >
           {preview ? (
             <img src={preview} className="h-full w-full object-cover" />
@@ -69,8 +69,14 @@ export const UserInput = () => {
         placeholder="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
+        className="bg-primary-100/90 text-primary-900 rounded-lg p-2 px-4 outline-0"
       />
-      <button type="submit">GO</button>
+      <button
+        type="submit"
+        className="bg-accent-500 w-full cursor-pointer rounded-lg px-4 py-1.5 text-xl font-semibold"
+      >
+        GO
+      </button>
     </form>
   );
 };
