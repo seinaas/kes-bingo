@@ -9,7 +9,7 @@ import { WebSocketServer } from "ws";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
 
 import { appRouter } from "./api/root";
-import { createTRPCContext } from "./api/trpc";
+import { createWSSContext } from "./api/trpc";
 
 const port = parseInt(process.env.PORT ?? "3000", 10);
 const dev = process.env.NODE_ENV !== "production";
@@ -23,11 +23,11 @@ void app.prepare().then(() => {
     const parsedUrl = parse(req.url, true);
     await handle(req, res, parsedUrl);
   });
-  const wss = new WebSocketServer({ server });
+  const wss = new WebSocketServer({ noServer: true });
   const handler = applyWSSHandler({
     wss,
     router: appRouter,
-    createContext: createTRPCContext,
+    createContext: createWSSContext,
   });
 
   wss.on("connection", (ws: Socket) => {
@@ -44,6 +44,7 @@ void app.prepare().then(() => {
 
   server.on("upgrade", function (req, socket, head) {
     const { pathname } = parse(req.url!, true);
+
     if (pathname !== "/_next/webpack-hmr") {
       wss.handleUpgrade(req, socket, head, function done(ws) {
         wss.emit("connection", ws, req);
