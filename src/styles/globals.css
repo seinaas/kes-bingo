@@ -27,3 +27,10 @@
   --color-accent-800: #cea800;
   --color-accent-900: #c09c01;
 }
+
+@utility grainy {
+  --tw-gradient-position: in oklab;
+  background:
+    radial-gradient(var(--tw-gradient-stops)),
+    url(https://grainy-gradients.vercel.app/noise.svg);
+}

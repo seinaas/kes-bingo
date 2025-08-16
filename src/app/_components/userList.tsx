@@ -23,6 +23,8 @@ const UserBadge = ({
         "from-primary-100/90 to-primary-200/80 text-primary-900 flex w-16 flex-col items-center justify-center gap-1 overflow-clip rounded-[50px_50px_10px_10px] bg-linear-to-b from-70% px-0.5 pb-1 shadow-md transition-all",
         currentUserId === user.id &&
           "from-accent-300 to-accent-500/80 shadow-xl",
+        user.didWin &&
+          "bg-gradient-to-b from-green-300 to-green-500/80 shadow-xl",
       )}
     >
       <Link
@@ -57,6 +59,15 @@ export const UserList = ({ currentUserId }: { currentUserId: string }) => {
   const { data: initialUsers } = api.user.getUsers.useQuery();
 
   const { data: users } = api.user.onUsersChange.useSubscription();
+  api.bingo.onWin.useSubscription(undefined, {
+    onData: (userId) => {
+      const user = users?.find((u) => u.id === userId);
+      if (user) {
+        user.didWin = true;
+      }
+      console.log("User won:", userId);
+    },
+  });
 
   return (
     <div>

@@ -6,6 +6,7 @@ import { Lobster, Outfit } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "~/server/auth";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -33,8 +34,15 @@ export default async function RootLayout({
       <body>
         <SessionProvider session={session}>
           <TRPCReactProvider>
-            <div className="from-primary-300 to-primary-500 flex min-h-screen flex-col items-center bg-radial text-white">
+            <div className="from-primary-300 to-primary-500 grainy relative z-0 flex min-h-screen flex-col items-center text-white">
               {children}
+              <Image
+                priority
+                src="/texture.jpg"
+                alt="Texture"
+                fill
+                className="absolute inset-0 -z-10 object-cover opacity-10 mix-blend-multiply"
+              />
             </div>
           </TRPCReactProvider>
         </SessionProvider>
