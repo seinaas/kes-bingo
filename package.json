@@ -16,10 +16,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
-    "start:next": "next start",
-    "start:server": "cross-env PORT=3001 tsx watch src/server/wssDevServer.ts --tsconfig tsconfig.server.json",
-    "start": "run-p start:*",
-    "temp": "cross-env NODE_ENV=production tsx ./src/server/wssProdServer.ts",
+    "start": "cross-env NODE_ENV=production tsx ./src/server/wssProdServer.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
