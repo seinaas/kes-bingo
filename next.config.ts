@@ -9,4 +9,7 @@ export default {
   images: {
     remotePatterns: [new URL(imgUrl ? `${imgUrl}**` : "")],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 } satisfies NextConfig;

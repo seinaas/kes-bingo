@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:1-next": "cross-env NODE_ENV=production next build",
+    "build:1-next": "tsc --noEmit && cross-env NODE_ENV=production next build",
     "build:2-server": "tsc --project tsconfig.server.json",
     "build": "rm -rf ./dist && run-s build:*",
     "check": "next lint && tsc --noEmit",
