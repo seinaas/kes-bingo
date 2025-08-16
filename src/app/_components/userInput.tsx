@@ -10,6 +10,7 @@ export const UserInput = () => {
   const [name, setName] = useState("");
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!image) return;
@@ -25,6 +26,10 @@ export const UserInput = () => {
     async (e: FormEvent) => {
       e.preventDefault();
 
+      if (isLoading) return;
+
+      setIsLoading(true);
+
       await signIn("uuid", { name, redirect: false });
 
       if (image) {
@@ -35,7 +40,7 @@ export const UserInput = () => {
 
       window.location.reload();
     },
-    [image, name],
+    [image, name, isLoading],
   );
 
   return (
@@ -73,9 +78,10 @@ export const UserInput = () => {
       />
       <button
         type="submit"
-        className="bg-accent-500 w-full cursor-pointer rounded-lg px-4 py-1.5 text-xl font-semibold"
+        className="bg-accent-500 disabled:bg-accent-800 w-full cursor-pointer rounded-lg px-4 py-1.5 text-xl font-semibold disabled:cursor-default disabled:opacity-70"
+        disabled={!name || isLoading}
       >
-        GO
+        {isLoading ? "Joining..." : "GO"}
       </button>
     </form>
   );
