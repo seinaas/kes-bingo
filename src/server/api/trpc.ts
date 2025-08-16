@@ -60,6 +60,7 @@ export const createWSSContext = async (opts: CreateWSSContextFnOptions) => {
       const token = await getToken({
         req: opts.req as unknown as Request,
         secret: process.env.AUTH_SECRET,
+        secureCookie: true,
       });
 
       console.log("Token retrieved:", token);
